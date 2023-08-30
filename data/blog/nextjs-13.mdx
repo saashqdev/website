@@ -1,0 +1,193 @@
+---
+title: 'Can Next13 Cut It With Large Business Systems?'
+date: '2023-08-29'
+tags: ['nextjs 13']
+draft: false
+summary: The general consensus as of the date of this writing is that Next13 is somewhat incomplete and not ready for production use. As with any new technology there's going to be pros, cons and unfinished business. However, after using Next13 in the build of SaasHQ I found the convenience far outweighs the negatives, even at this stage of the game. There are many large applications currently running on Next12 without issue and I don't see Next13 being any different.
+images: ['/static/images/banners/nextjs.png']
+---
+
+One of the primary goals of SaasHQ is to combine coding and conversation. A great way to see how well Next13 performs is to let it loose on a public project. So instead of small code snippets, we're offering a whole application to get a full view of where snags happen. To get things rolling I'll outline the general pros and cons of Next13. I realize this has been done ad infinitum but let's briefly review.
+
+## Start with the Pros
+
+### 1. App/Directory enabling File-Based Routing
+
+File-based routing is one of Next.js's coolest features. Routes can be specified using the project directory structure instead of dealing with complicated route settings in a program like react-router. You can construct a new path by adding an entry point to the directory page.
+
+On top of this concept, Next.js 13 offers revised file routing with the new directory. The optional app directory brings a new layout structure with several additional features and improvements.
+
+The directory structure has undergone minor changes due to the new routing mechanism. Each path in the route has a dedicated directory with a **page.js** file that serves as the content entry point in Next.js 13. It is how the new routing is different from the previous one.
+
+The new structure enables us to include additional files in each path directory. Also, the page.js for a route, such as
+
+  - **layout.js** - A system for the path & its sub-paths.
+   
+  - **loading.js** - A system for an instant loading state using React.
+  
+Suspense under the hood & error.js, a component is displayed if the primary component cannot load. We can now co locate source files inside our path directories because each path is now its own directory.
+
+A fantastic feature that has always existed is file-based routing, and the new app/ directory improves upon that. The content routes mirror the content directory structure, which streamlines development and helps bring back the utmost simplicity of constructing more static pages.
+
+### 2. React Server Components
+
+Next.js 13's additional support for React server components is the most interesting new feature. For quicker delivery, a smaller JavaScript bundle, and less expensive client-side rendering, server components enable us to execute and render React components on the server side.
+
+Additionally, server components are automatically cached at build-time or runtime for extra performance advantages based on the type of data needed to render a route. You will need to structure your application following as server & client components' capabilities differ somewhat.
+
+Generally speaking you want to use client components whenever you want have some sort of user interactivity. For example when you want to have a button which triggers a certain action, you need to choose a client component.
+
+To simplify the decisions when to use which type you can have a look at the following table:
+
+![](/static/images/table1.png)
+
+You can use client components by simply adding a **'use client'** directive on top of the file. By doing so your component is going to be shipped to the user where the javascript can be executed.
+
+```
+'use client';
+ 
+import { useState } from 'react';
+ 
+export default function Counter() {
+  const [count, setCount] = useState(0);
+ 
+  return (
+    <div>
+      <p>You clicked {count} times</p>
+      <button onClick={() => setCount(count + 1)}>Click me</button>
+    </div>
+  );
+}
+```
+
+### 3. Async Components and Data Fetching
+
+Async components, a new method of data collecting for server-rendered components, are also introduced in Next.js 13. We can render systems using Promises with async & await when utilizing async components.
+
+If a Promise-returning external service or API needs to be queried for data, we declare the component as async and wait for the outcome:
+
+```
+async func getData() {
+
+const res = await fetch ('https://api.example.com/...');​
+
+return res.json();
+
+}
+
+export default async function Page() {
+
+const name = await getData();
+
+return '...';
+
+}
+```
+To resolve the request data outside of the component's lifecycle and use it as component props, previous iterations of Next.js required a completely new API. The following example demonstrates a Next.js 12 method for obtaining data from a third-party service:
+
+```
+// This gets called on every request export async function getServerSideProps()
+
+{
+
+// Fetch data from external API
+
+const res = await fetch(https://.../data)
+
+const data = await res.json()
+
+// Pass data to the page via props return
+
+{ props: { data } }
+
+}
+```
+
+Even though it is not included in the new app/ directory, the earlier method is still supported. You'll need to upgrade your server components to benefit from the new app/ directory structure and its exciting new capabilities. However, you can still use the Next.js 12 pages/routing for your app if you're not ready to rock.
+
+### 4. Streaming
+
+Users may have to wait for the entire page to generate before accessing them. As the UI is generated, the server will send small bits of it to the client. It implies that larger chunks won't obstruct smaller ones. Of course, right now, this feature is only supported in the app directory, and it doesn't appear that this will change.
+
+This new addition won't help those with fast Wi-Fi or access to a strong internet connection as much as those with poorer connections. Contrary to what you would have expected, there are more people like this. It's excellent that they can have a better experience with faster web loading speeds.
+
+### 5. Turbopack
+
+As the "successor to Webpack," a new JavaScript bundler named Turbopack was the final significant update made with Next.js 13 release. One of the most popular JavaScript build tools, Webpack, is incredibly customizable and powerful but may occasionally be sluggish and cumbersome.
+
+The developers of Webpack have created Turbopack, which is built in Rust and promises to be 700 times quicker than the original Webpack (and 10x faster than Vite, a more modern alternative).
+
+One change is that Rust can create plugins rather than JavaScript. The number of JavaScript developers proficient in the systems language is significantly less than the total number of JS developers.
+
+Using next dev —turbo to launch your development server, you can test out the new Turbopack bundler if you build a new Next.js 13 app.
+
+### 6. Other Upgrades
+
+Along with specific enhancements to the functionality of links in Next.js 13, additional packages are on the way and might speed up your images and font loading. In both the pages directory and the app, they function identically.
+
+- #### next/image
+
+  Less client-side JavaScript, styling and configuration, and increased accessibility are all features of the new Image component in Next.js. The next/image import has been changed to next/legacy/image, and the next/future/image import has been renamed to next/image in terms of code modifications. There is a codemod to facilitate rapid migration.
+
+- #### next/font
+
+  The new @next/font allows you to use Google Fonts (or any custom font) without the browser sending any queries. CSS and font files are downloaded at build time with other static assets.
+
+- #### next/link
+
+  The next/link component, a similar method of navigation to the native anchor element but with additional built-in features for optimization. The Next.js Link component has additional benefits, such as options to customize navigation behavior through props and improved performance and SEO metrics.
+  
+## Now for the Cons
+
+### 1. Well, it's New and Beta
+
+Not necessarily a bad thing. They even tell you to tread lightly but given the Next ecosystem track record we feel comfortable going down this road. Let's face it, technology moves on and you can't go backwards so you need to bite the bullet at some point. SaasHQ is committed to this technology stack.
+
+### 2. Breaking Changes
+
+Porting an old Next appication will be alot of work. As mentioned earlier, they are allowing the old /page format to remain. For how long, that's unknown.
+
+### 3. Non-Chaining Middleware
+
+Although Next 13 introduced middleware.js file, it’s non-chaining unlike express middleware which can be chained on top of each other. Putting all your middleware requirements in a single file seems too clunky to some developers.
+
+Third-party libs like next-connect can provide some express-like routing capabilities in middleware per route. But in a serious application using JWT auth, and role-based auth, I would need every route handler to import and use a stack of middleware which is cumbersome. Also, something as basic as this could have been chained like layout.js files are chained. Each level of directory nesting could have its own middleware that passes state via request property like express.
+
+### 4. No Page.ts Raw Request Context and Middleware Support
+
+Next13 introduces server-side components which can fetch data directly from the database. This is a really powerful feature but in a serious production app, most routes will be behind authentication and routing would be strictly guarded. What data can be shown on a page would be dependent on the logged-in user's state.
+
+While we can use headers and cookies in server-side components via https://beta.nextjs.org/docs/api-reference/cookies and https://beta.nextjs.org/docs/api-reference/headers
+
+I would expect the framework to provide a common place where I can decode logged-in state and pass the user context downstream to server-side rendering.
+
+The current approach would require me to decode tokens on every component or rely on props passed from client-side components. The problem with that is client-side props can’t be relied upon when considering the security of your application. The client-side state can always be edited by local js and plugins.
+
+- #### Workarounds and Alternatives:
+
+  You can keep most of the app as client-side components and use any state management lib to fire APIs with secure tokens every time.
+  
+  But this just kills the whole idea of speedup using SSR. Next really wants you to keep most of the app as SSR and only have leaf nodes on the client side. Wrapping large parts of your app in context providers makes that entire tree to be client-side rendered. Although you can argue that client-side components can have SSR components as children, then managing logged-in users' state is again a problem because as I mentioned earlier, SSR components only get raw headers and cookies and can’t rely on client-side props for security.
+
+### 5. Context Sharing Between Client/Server Components 
+
+As the docs say, Server-components can have client-components but client-components can only have server-components as children or props. While this makes perfect sense, complex user interactivity is most likely to happen on client components only. Now this interactivity would then need to trigger server-side renders for SSR components. In a non-user logged-in state, this is easy to achieve but when we add authentication to the mix, it gets needlessly hard. You will most likely consider using client-side components only because managing user state in SSR componets is so hard. Which also means you’ll loose all the advantages of starting with next in the first place.
+
+### 6. Edge Computing Not For All Applications
+
+Next is made by Vercel and Vercel wants you to buy their offering which is blazing fast edge functions. While edge computing is fast, it’s a no-go for any application using a traditional database like MySql, Postgres or MongoDB. It may work in serverless DB stacks but these databases are here to stay and not everything needs to be modeled serverless.
+
+If you’re using any one of these features, edge is likely not for you:
+
+  - Databases and connection pooling via popular ORMs like Sequelize
+  - Native binaries like puppeteer for generating PDFs
+  - Socket connections with your backend that connects to redis cluster for synchronization across load-balanced servers.
+  
+### Summary
+
+Only time will tell how successful Next 13 will be in large Saas installations and the enterprise. If the above cursory observations give you cause for alarm then it's probably not a good route to go. On the plus side the convenience and speed of development attributed to Next 13 is worth considering. SaasHQ is an attempt to investigate Next 13 in a business application. It's intended to grow and keep up with the latest developments in the Next ecosystem.
+
+
+
+
+
