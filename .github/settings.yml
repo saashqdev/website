@@ -1,5 +1,5 @@
 repository:
-  name: saashq
+  name: website
   description: Enterprise CRM/ERP Starter
   private: false
   default_branch: main
