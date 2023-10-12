@@ -3,7 +3,7 @@ const siteMetadata = {
   title: 'SaasHQ CRM Starter',
   author: 'SaasHQ',
   headerTitle: 'SaasHQ',
-  description: 'A site dedicated to Next13+ technologies and Saas CRM/ERP',
+  description: 'A site dedicated to Remix/Next13+ technologies and Saas business systems',
   language: 'en-us',
   theme: 'system', // system, dark or light
   siteUrl: 'https://saashq.org',
